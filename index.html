@@ -161,8 +161,10 @@ input.pre{background:#fafff9;border-color:#b8d9c4}
     <div class="nav-sub-wrap" id="nav-filing-sub">
       <div class="nav-sub" id="nav-filing-wht" onclick="goFiling('wht')">원천세</div>
       <div class="nav-sub" id="nav-filing-vat" onclick="goFiling('vat')">부가세</div>
-      <div class="nav-sub" id="nav-filing-corp" onclick="goFiling('corp')">법인세·소득세</div>
-      <div class="nav-sub" id="nav-filing-close" onclick="goFiling('close')">결산</div>
+      <div class="nav-sub" id="nav-filing-corp" onclick="goFiling('corp')">법인세</div>
+      <div class="nav-sub" id="nav-filing-income" onclick="goFiling('income')">소득세</div>
+      <div class="nav-sub" id="nav-filing-close1" onclick="goFiling('close1')">결산 (상반기)</div>
+      <div class="nav-sub" id="nav-filing-close2" onclick="goFiling('close2')">결산 (하반기)</div>
     </div>
     <div class="nav" id="nav-arrear" onclick="go('arrear')"><div class="nav-dot"></div>미수 관리<span class="nav-badge">3</span></div>
     <div class="nav" id="nav-cms" onclick="go('cms')"><div class="nav-dot"></div>CMS 업로드</div>
@@ -347,9 +349,9 @@ input.pre{background:#fafff9;border-color:#b8d9c4}
             </div>
             <div class="dl"><span>수임 조건</span></div>
             <div class="fg fg3">
-              <div class="f"><label>기장료</label><input id="nc-fee" placeholder="0" oninput="calcNcSum()"></div>
-              <div class="f"><label>조정료</label><input id="nc-adj" placeholder="0" oninput="calcNcSum()"></div>
-              <div class="f"><label>신고대리료</label><input id="nc-filing" placeholder="0" oninput="calcNcSum()"></div>
+              <div class="f"><label>기장료</label><input id="nc-fee" placeholder="0" oninput="calcNcSum();this.value=formatFee(this.value)" onblur="this.value=formatFee(this.value)"></div>
+              <div class="f"><label>조정료</label><input id="nc-adj" placeholder="0" oninput="calcNcSum();this.value=formatFee(this.value)" onblur="this.value=formatFee(this.value)"></div>
+              <div class="f"><label>신고대리료</label><input id="nc-filing" placeholder="0" oninput="calcNcSum();this.value=formatFee(this.value)" onblur="this.value=formatFee(this.value)"></div>
             </div>
             <div style="padding:9px 13px;background:var(--acl);border-radius:var(--r);display:flex;justify-content:space-between;align-items:center;margin-top:8px">
               <span style="font-size:12px;color:var(--ac)">월 합계</span>
@@ -370,21 +372,40 @@ input.pre{background:#fafff9;border-color:#b8d9c4}
 
       <!-- 직접 추가 모달 -->
       <div id="add-task-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:center;justify-content:center">
-        <div style="background:var(--sur);border-radius:var(--rl);width:420px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.15)">
+        <div style="background:var(--sur);border-radius:var(--rl);width:460px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.15)">
           <div style="padding:16px 20px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between">
             <div style="font-size:14px;font-weight:600">할 일 직접 추가</div>
             <button onclick="closeAddTask()" style="background:none;border:none;font-size:18px;color:var(--tx3);cursor:pointer">×</button>
           </div>
-          <div style="padding:18px 20px">
-            <div class="f" style="margin-bottom:12px"><label>할 일 내용 <span class="req">*</span></label><input id="at-title" placeholder="할 일을 입력하세요..."></div>
-            <div class="fg" style="margin-bottom:12px">
+          <div style="padding:18px 20px;display:flex;flex-direction:column;gap:12px">
+            <div class="f"><label>할 일 내용 <span class="req">*</span></label><input id="at-title" placeholder="할 일을 입력하세요..."></div>
+            <div class="fg">
               <div class="f"><label>분류</label>
                 <select id="at-cat"><option>수임</option><option>신고</option><option>미수</option><option>급여</option><option>CMS</option><option>루틴</option><option>기타</option></select>
               </div>
-              <div class="f"><label>긴급도</label>
-                <select id="at-level"><option value="urgent">긴급</option><option value="today" selected>오늘 권장</option></select>
+              <div class="f"><label>마감일 <span class="req">*</span></label>
+                <input type="date" id="at-deadline" style="width:100%">
               </div>
             </div>
+            <div class="fg">
+              <div class="f"><label>담당자</label>
+                <select id="at-assignee">
+                  <option value="">전체 직원</option>
+                  <option value="팀장급">팀장급 전체</option>
+                  <option>김민준</option><option>이수진</option><option>박지훈</option><option>이민경</option>
+                </select>
+              </div>
+              <div class="f"><label>거래처</label>
+                <select id="at-client">
+                  <option value="">전체 거래처</option>
+                  <option value="법인">법인 전체</option>
+                  <option value="개인">개인 전체</option>
+                  <option value="성실">성실 전체</option>
+                  <option value="divider" disabled>── 개별 거래처 ──</option>
+                </select>
+              </div>
+            </div>
+            <div style="padding:10px 13px;background:var(--sur2);border-radius:var(--r);font-size:12px;color:var(--tx3)" id="at-dday-preview">마감일을 선택하면 긴급도가 자동으로 결정돼요</div>
           </div>
           <div style="padding:14px 20px;border-top:1px solid var(--brd);background:var(--sur2);display:flex;justify-content:flex-end;gap:8px">
             <button class="btn bs bsm" onclick="closeAddTask()">취소</button>
@@ -541,16 +562,26 @@ input.pre{background:#fafff9;border-color:#b8d9c4}
         </div>
         <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap" id="fl-stabs">
           <div class="stab on" onclick="flSetTab('all',this)">전체</div>
-          <div class="stab" onclick="flSetTab('예정',this)">예정</div>
+          <div class="stab" onclick="flSetTab('예정',this)">시작 전</div>
           <div class="stab" onclick="flSetTab('진행중',this)">진행 중</div>
           <div class="stab" onclick="flSetTab('완료',this)">완료</div>
           <div class="stab" onclick="flSetTab('누락',this)">누락</div>
         </div>
         <div class="fb">
           <input placeholder="업체명 검색..." id="fl-q" oninput="flRenderList()">
-          <select id="fl-f-type" onchange="flRenderList()"><option value="">신고 종류</option><option>원천세</option><option>부가세</option><option>법인세</option><option>소득세</option><option>결산 (상반기)</option><option>결산 (하반기)</option></select>
           <select id="fl-f-asgn" onchange="flRenderList()"><option value="">전체 담당자</option><option>김민준</option><option>이수진</option><option>박지훈</option></select>
           <span style="margin-left:auto;font-size:11px;color:var(--tx3)" id="fl-res-cnt"></span>
+        </div>
+        <!-- 담당자 선택 시 해당 담당자 KPI -->
+        <div id="fl-asgn-kpi" style="display:none;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:600;color:var(--tx3);margin-bottom:6px" id="fl-asgn-kpi-label"></div>
+          <div class="kpi-row" style="grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:0">
+            <div class="kpi"><div class="kpi-label">전체</div><div class="kpi-val" id="fl-ak-total">0</div></div>
+            <div class="kpi green"><div class="kpi-label">완료</div><div class="kpi-val" id="fl-ak-done">0</div></div>
+            <div class="kpi blue"><div class="kpi-label">진행 중</div><div class="kpi-val" id="fl-ak-prog">0</div></div>
+            <div class="kpi red"><div class="kpi-label">긴급 D-3↓</div><div class="kpi-val" id="fl-ak-urg">0</div></div>
+            <div class="kpi gray"><div class="kpi-label">누락</div><div class="kpi-val" id="fl-ak-miss">0</div></div>
+          </div>
         </div>
         <div class="tbl-wrap">
           <div class="tbl-head" style="grid-template-columns:170px 120px 100px 90px 70px 1fr 80px">
@@ -580,7 +611,8 @@ input.pre{background:#fafff9;border-color:#b8d9c4}
           <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
             <div class="f"><label class="f" style="font-size:11px;font-weight:500;color:var(--tx2);margin-bottom:3px">업체명 *</label><select id="flam-co" style="padding:7px 10px;border:1.5px solid var(--brd);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none"><option value="">선택</option><option>한빛약국</option><option>동화제과</option><option>강남빌딩관리</option><option>(주)한국식품</option><option>꿈나래학원</option></select></div>
             <div class="f"><label style="font-size:11px;font-weight:500;color:var(--tx2);margin-bottom:3px">세목 *</label><select id="flam-type" style="padding:7px 10px;border:1.5px solid var(--brd);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none"><option>원천세</option><option>부가세</option><option>법인세</option><option>소득세</option><option>결산 (상반기)</option><option>결산 (하반기)</option></select></div>
-            <div class="f"><label style="font-size:11px;font-weight:500;color:var(--tx2);margin-bottom:3px">신고 기간</label><input id="flam-period" placeholder="예: 2024년 1월" style="padding:7px 10px;border:1.5px solid var(--brd);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none;width:100%"></div>
+            <div class="f"><label style="font-size:11px;font-weight:500;color:var(--tx2);margin-bottom:3px">구분</label><select id="flam-entity" style="padding:7px 10px;border:1.5px solid var(--brd);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none"><option>법인</option><option>개인</option><option>성실</option></select></div>
+            <div class="f"><label style="font-size:11px;font-weight:500;color:var(--tx2);margin-bottom:3px">신고 기간</label><input id="flam-period" placeholder="예: 1기 예정" style="padding:7px 10px;border:1.5px solid var(--brd);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none;width:100%"></div>
             <div class="f"><label style="font-size:11px;font-weight:500;color:var(--tx2);margin-bottom:3px">마감일 *</label><input type="date" id="flam-dl" style="padding:7px 10px;border:1.5px solid var(--brd);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none;width:100%"></div>
             <div class="f"><label style="font-size:11px;font-weight:500;color:var(--tx2);margin-bottom:3px">담당자</label><select id="flam-asgn" style="padding:7px 10px;border:1.5px solid var(--brd);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none"><option>김민준</option><option>이수진</option><option>박지훈</option></select></div>
             <div class="f"><label style="font-size:11px;font-weight:500;color:var(--tx2);margin-bottom:3px">반기납 여부</label><select id="flam-half" style="padding:7px 10px;border:1.5px solid var(--brd);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none"><option value="N">해당없음</option><option value="Y">반기납</option></select></div>
@@ -681,15 +713,25 @@ input.pre{background:#fafff9;border-color:#b8d9c4}
               </div>
             </div>
             <div class="f"><label>대상</label>
-              <select id="rm-target">
+              <select id="rm-target" onchange="onRmTargetChange(this.value)">
                 <option value="all">전체 거래처</option>
                 <option value="payroll">인건비 있는 거래처</option>
+                <option value="client">개별 거래처 지정</option>
                 <option value="fixed">고정 담당자</option>
                 <option value="none">거래처 무관</option>
               </select>
             </div>
             <div class="f" id="rm-assignee-wrap" style="display:none"><label>고정 담당자</label>
               <select id="rm-assignee"><option>김민준</option><option>이수진</option><option>박지훈</option><option>이민경</option></select>
+            </div>
+            <div id="rm-client-wrap" style="display:none">
+              <div class="f" style="margin-bottom:6px"><label>거래처 검색</label>
+                <div style="display:flex;gap:6px">
+                  <input id="rm-client-q" placeholder="업체명 검색..." oninput="filterRmClients()" style="flex:1">
+                </div>
+              </div>
+              <div id="rm-client-list" style="max-height:140px;overflow-y:auto;border:1.5px solid var(--brd);border-radius:var(--r);background:var(--sur)"></div>
+              <div id="rm-client-selected" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:7px"></div>
             </div>
             <div class="f"><label>메모 (선택)</label><input id="rm-memo" placeholder="업무 설명"></div>
           </div>
@@ -790,7 +832,7 @@ function generateTasks(){
   var tasks=[];
   var tid=1;
   var todayD=new Date(today);todayD.setHours(0,0,0,0);
-  var curUser=document.getElementById('dash-role')?document.getElementById('dash-role').dataset.user:'김민준';
+  var curUser=ROLES[currentRole]?ROLES[currentRole].user:'김민준';
 
   function dayDiff(dateStr){
     if(!dateStr) return null;
@@ -927,7 +969,7 @@ function renderDash(){
   else dt.style.display='none';
 
   // 신고 마감 일정 (내 담당, D-14 이내)
-  var curUser=document.getElementById('dash-role')?document.getElementById('dash-role').dataset.user:'김민준';
+  var curUser=ROLES[currentRole]?ROLES[currentRole].user:'김민준';
   var upcomingFilings=FL_DATA.filter(function(r){
     if(r.asgn!==curUser||r.status==='완료') return false;
     var d=new Date(r.dl);d.setHours(0,0,0,0);
@@ -978,7 +1020,7 @@ function openComm(id){
   document.getElementById('cd-steps').innerHTML=sh;
   var dh='';
   STEPS_DEF.forEach(function(s,i){var n=i+1,d=n<c.step,a=n===c.step,val=c[s.key]||'',ist=d?'border-color:#b8d9c4;background:#fafff9':'',bc=d?'b-green':(a?'b-blue':'b-gray'),bt=d?'완료':(a?'진행 중':'대기');
-    dh+='<div class="dr"><span class="dr-l">'+s.label.replace('\n',' ')+'</span><input type="date" value="'+val+'" style="'+ist+'"><div class="dr-s"><span class="badge '+bc+'">'+bt+'</span></div></div>';});
+    dh+='<div class="dr"><span class="dr-l">'+s.label.replace('\n',' ')+'</span><input type="date" value="'+val+'" style="'+ist+'" data-key="'+s.key+'" onchange="onCommDateChange('+c.id+',this)"><div class="dr-s"><span class="badge '+bc+'">'+bt+'</span></div></div>';});
   document.getElementById('cd-dates').innerHTML=dh;
   document.getElementById('cd-info').innerHTML=iF('담당자',c.assignee)+iF('기장료',c.fee+'원')+iF('영업자',c.sales+' ('+c.salesType+')')+iF('계약일',c.contract);
   renderCN(c);
@@ -986,6 +1028,20 @@ function openComm(id){
   go('comm-detail');
 }
 function iF(l,v){return '<div class="ifield"><div class="ilabel">'+l+'</div><div class="ival">'+v+'</div></div>';}
+
+function onCommDateChange(id,input){
+  var c=COMMS.find(function(x){return x.id===id;});
+  if(!c) return;
+  c[input.dataset.key]=input.value;
+  updateCommStep(c);
+  input.style.borderColor=input.value?'#b8d9c4':'';
+  input.style.background=input.value?'#fafff9':'';
+  document.getElementById('cd-meta').innerHTML='<span class="badge '+(BS[c.status]||'b-gray')+'">'+c.status+'</span>&nbsp;<span class="tag">'+c.sector+'</span>&nbsp;<span style="font-size:12px;color:var(--tx3)">담당: '+c.assignee+'</span>';
+  var isEnd=!!(c.docs);
+  document.getElementById('reg-banner').style.display=isEnd?'flex':'none';
+  document.getElementById('btn-to-reg').style.display=isEnd?'inline-flex':'none';
+  renderComm();
+}
 function renderCN(c){
   if(!c.notes||!c.notes.length){document.getElementById('cd-notes').innerHTML='<div style="padding:12px;text-align:center;font-size:12px;color:var(--tx3)">등록된 특이사항 없음</div>';return;}
   document.getElementById('cd-notes').innerHTML=c.notes.map(function(n,i){return '<div class="memo-item"><div class="memo-meta"><span class="memo-au">'+n.author+'</span><span class="memo-t">'+n.time+'</span>'+(i===0?'<span class="memo-new">최신</span>':'')+'</div><div style="font-size:13px">'+n.content+'</div></div>';}).join('');
@@ -1449,9 +1505,9 @@ function toggleStaff(i){
 // 역할 전환
 var currentRole='leader';
 var ROLES={
-  admin:{name:'이대표',role:'관리자',av:'관',avBg:'#E24B4A',dash:'dash-admin'},
-  leader:{name:'김민준',role:'팀장',av:'민',avBg:'var(--ac)',dash:'dash'},
-  staff:{name:'이수진',role:'직원',av:'수',avBg:'#378ADD',dash:'dash'},
+  admin:{name:'이대표',role:'관리자',av:'관',avBg:'#E24B4A',dash:'dash-admin',user:'이대표'},
+  leader:{name:'김민준',role:'팀장',av:'민',avBg:'var(--ac)',dash:'dash',user:'김민준'},
+  staff:{name:'이수진',role:'직원',av:'수',avBg:'#378ADD',dash:'dash',user:'이수진'},
 };
 function toggleRoleMenu(){
   var m=document.getElementById('role-menu');
@@ -1463,24 +1519,23 @@ function switchRole(role){
   document.getElementById('av-txt').textContent=r.av;
   document.getElementById('av-txt').style.background=r.avBg;
   document.getElementById('user-name').textContent=r.name+' ('+r.role+')';
-  // 메뉴 선택 표시
   ['admin','leader','staff'].forEach(function(k){
     document.getElementById('rm-'+k).style.background=k===role?'var(--acl)':'';
   });
   document.getElementById('role-menu').style.display='none';
-  // 대시보드 전환
   document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
   document.querySelectorAll('.nav').forEach(function(n){n.classList.remove('on');});
   document.getElementById('view-'+r.dash).classList.add('on');
   document.getElementById('nav-dash').classList.add('on');
-  // 관리자 날짜
   if(role==='admin'){
     var el=document.getElementById('admin-dash-date');
     if(el)el.textContent=today.getFullYear()+'년 '+(today.getMonth()+1)+'월 '+today.getDate()+'일';
     renderStaffTasks();
+  } else {
+    // 직원/팀장 대시보드 할 일 재렌더 (담당자 필터 적용)
+    renderDash();
   }
   document.getElementById('bc').innerHTML='<span>대시보드</span>';
-  // 관리자는 인사/급여 메뉴 항상 보임
   var hrNav=document.getElementById('nav-hr');
   if(role==='admin') hrNav.innerHTML='<div class="nav-dot"></div>인사/급여';
   else hrNav.innerHTML='<div class="nav-dot"></div>인사/급여 🔒';
@@ -1553,32 +1608,109 @@ function saveNewComm(andNext){
 var MANUAL_TASKS=[];var manId=9000;
 function openAddTask(){
   document.getElementById('at-title').value='';
+  document.getElementById('at-deadline').value='';
+  document.getElementById('at-dday-preview').textContent='마감일을 선택하면 긴급도가 자동으로 결정돼요';
+  document.getElementById('at-dday-preview').style.color='var(--tx3)';
+  // 거래처 select 동적 생성
+  var cs=document.getElementById('at-client');
+  while(cs.options.length>5) cs.remove(5);
+  CLIENTS.forEach(function(c){
+    var o=document.createElement('option');
+    o.value='client:'+c.id;o.textContent=c.name+' ('+c.entity+')';
+    cs.appendChild(o);
+  });
   var m=document.getElementById('add-task-modal');m.style.display='flex';
   setTimeout(function(){document.getElementById('at-title').focus();},80);
 }
 function closeAddTask(){document.getElementById('add-task-modal').style.display='none';}
+
+// 마감일 변경 시 D-day 미리보기
+document.addEventListener('change',function(e){
+  if(e.target.id!=='at-deadline') return;
+  var val=e.target.value;
+  if(!val){document.getElementById('at-dday-preview').textContent='마감일을 선택하면 긴급도가 자동으로 결정돼요';return;}
+  var d=new Date(val);d.setHours(0,0,0,0);
+  var t=new Date(today);t.setHours(0,0,0,0);
+  var diff=Math.round((d-t)/(1000*60*60*24));
+  var prev=document.getElementById('at-dday-preview');
+  if(diff<0){prev.textContent='⚠ 마감 초과 (D+'+Math.abs(diff)+') → 🔴 긴급';prev.style.color='var(--dan)';}
+  else if(diff===0){prev.textContent='D-day → 🔴 긴급';prev.style.color='var(--dan)';}
+  else if(diff<=3){prev.textContent='D-'+diff+' → 🔴 긴급';prev.style.color='var(--wrn)';}
+  else if(diff<=7){prev.textContent='D-'+diff+' → 🟡 오늘 권장';prev.style.color='var(--ac)';}
+  else{prev.textContent='D-'+diff+' → 📋 일반';prev.style.color='var(--tx3)';}
+});
+
 function submitAddTask(){
   var title=document.getElementById('at-title').value.trim();
   if(!title){document.getElementById('at-title').focus();return;}
+  var deadline=document.getElementById('at-deadline').value;
+  if(!deadline){document.getElementById('at-deadline').focus();return;}
   var cat=document.getElementById('at-cat').value;
-  var level=document.getElementById('at-level').value;
-  MANUAL_TASKS.push({id:manId++,level:level,cat:cat,name:title,meta:'직접 추가 · '+today.getFullYear()+'-'+pad(today.getMonth()+1)+'-'+pad(today.getDate()),badge:{t:level==='urgent'?'긴급':'오늘',c:level==='urgent'?'b-red':'b-amber'}});
+  var assignee=document.getElementById('at-assignee').value;
+  var clientVal=document.getElementById('at-client').value;
+
+  // D-day 기준 긴급도 자동 결정
+  var d=new Date(deadline);d.setHours(0,0,0,0);
+  var t=new Date(today);t.setHours(0,0,0,0);
+  var diff=Math.round((d-t)/(1000*60*60*24));
+  var level=diff<=3?'urgent':'today';
+  var badgeTxt=diff<0?'D+'+Math.abs(diff):diff===0?'D-day':'D-'+diff;
+  var badgeColor=diff<=0?'b-red':diff<=3?'b-amber':'b-blue';
+
+  // 담당자/거래처 메타 구성
+  var meta=deadline;
+  if(assignee) meta+=' · '+assignee;
+  if(clientVal&&clientVal!==''){
+    if(clientVal.startsWith('client:')){
+      var cid=parseInt(clientVal.replace('client:',''));
+      var cl=CLIENTS.find(function(x){return x.id===cid;});
+      if(cl) meta+=' · '+cl.name;
+    } else {
+      meta+=' · '+clientVal+' 전체';
+    }
+  }
+
+  MANUAL_TASKS.push({id:manId++,level:level,cat:cat,name:title,meta:meta,badge:{t:badgeTxt,c:badgeColor}});
   closeAddTask();
-  // TASKS에 포함해서 다시 렌더
-  TASKS.push(MANUAL_TASKS[MANUAL_TASKS.length-1]);
   renderDash();
 }
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape') closeAddTask();
-  if(e.key==='Enter'&&document.activeElement===document.getElementById('at-title')) submitAddTask();
 });
+
+// ── 수임 날짜 입력 시 상태 자동 변경 ──
+var STATUS_MAP=[
+  {key:'contract', step:1, status:'해피콜 예정'},
+  {key:'happycall',step:2, status:'CMS 등록 예정'},
+  {key:'cms',      step:3, status:'전 대리인 요청'},
+  {key:'prev_agent',step:4,status:'고객 자료 요청'},
+  {key:'cust_req', step:5, status:'자료 수취'},
+  {key:'docs',     step:6, status:'수수료 정산 대기'},
+  {key:'settle',   step:7, status:'종결'},
+];
+function updateCommStep(c){
+  // 입력된 마지막 단계 기준으로 status/step 업데이트
+  var newStep=1, newStatus='계약서 접수';
+  STATUS_MAP.forEach(function(s){
+    if(c[s.key]) {newStep=s.step+1; newStatus=s.status;}
+  });
+  // 종결은 settle 입력 시
+  if(c.settle){newStep=8;newStatus='종결';}
+  c.step=newStep; c.status=newStatus;
+}
+
+// ── 기장료 천원단위 쉼표 ──
+function formatFee(val){
+  var n=parseInt((val||'').toString().replace(/[^0-9]/g,''))||0;
+  return n>0?n.toLocaleString():'';
+}
 
 // ── 신고 일정 ──
 var flYear=today.getFullYear(), flMonth=today.getMonth()+1, flTab='all', flCurId=null;
 var FL_DATA=[
   {id:101,co:'한빛약국',sector:'약국',type:'원천세',period:'2026년 4월',dl:'2026-04-10',asgn:'김민준',status:'완료',half:false,cl:{급여자료수취:{done:true,date:'2026-04-04'},급여명세서발송:{done:true,date:'2026-04-05'},신고서작성:{done:true,date:'2026-04-07'},홈택스신고:{done:true,date:'2026-04-08'},납부확인:{done:true,date:'2026-04-09'},지급명세서제출:{done:true,date:'2026-04-10'}},notes:[{au:'김민준',t:'2026-04-09 11:00',c:'정상 신고 완료.'}]},
   {id:102,co:'동화제과',sector:'제조업',type:'원천세',period:'2026년 4월',dl:'2026-04-10',asgn:'이수진',status:'누락',half:false,cl:{급여자료수취:{done:true,date:'2026-04-05'},급여명세서발송:{done:false,date:''},신고서작성:{done:false,date:''},홈택스신고:{done:false,date:''},납부확인:{done:false,date:''},지급명세서제출:{done:false,date:''}},notes:[{au:'이수진',t:'2026-04-11 09:00',c:'대표자 연락 안됨. 가산세 발생 가능.'}]},
-  {id:103,co:'강남빌딩관리',sector:'부동산업',type:'부가세',period:'1기 예정',entity:'법인',dl:'2026-04-25',asgn:'김민준',status:'진행중',half:false,cl:{'자료수취 (매출·매입)':{done:true,date:'2026-04-18'},납부금액:{done:true,date:'2026-04-19',amount:'1240000'},상신완료일:{done:true,date:'2026-04-20'},최종결재일:{done:false,date:''},신고완료일:{done:false,date:''},안내문발송:{done:false,date:''},분납여부:{done:false,date:''},납부확인:{done:false,date:''}},special:{환급여부:false,비고:''},pay:{분할여부:false,분할1:'',분할2:'',분할3:'',분할4:'',최종납부확인:false},notes:[]},
+  {id:103,co:'강남빌딩관리',sector:'부동산업',type:'부가세',period:'1기 예정',entity:'법인',dl:'2026-04-25',asgn:'김민준',status:'진행중',half:false,cl:{'자료수취 (매출·매입)':{done:true,date:'2026-04-18'},'납부금액':{done:true,date:'2026-04-19',amount:'1240000'},'상신완료일':{done:true,date:'2026-04-20'},'최종결재일':{done:false,date:''},'신고완료일':{done:false,date:''},'안내문발송':{done:false,date:''},'분납여부':{done:false,date:''},'납부확인':{done:false,date:''}},special:{환급여부:false,비고:''},pay:{분할여부:false,분할1:'',분할2:'',분할3:'',분할4:'',최종납부확인:false},notes:[]},
   {id:104,co:'(주)한국식품',sector:'음식점업',type:'부가세',period:'1기 예정',entity:'개인',dl:'2026-04-25',asgn:'김민준',status:'예정',half:false,cl:{예정고지금액확인:{done:false,date:'',amount:''},고객안내완료:{done:false,date:''},'면제여부확인 (50만원 미만)':{done:false,date:'',exempt:false},분납여부:{done:false,date:''},납부확인:{done:false,date:''}},special:{환급여부:false,비고:''},pay:{분할여부:false,분할1:'',분할2:'',분할3:'',분할4:'',최종납부확인:false},notes:[{au:'김민준',t:'2026-04-20 14:00',c:'4월 예정고지 대상. 금액 확인 필요.'}]},
   {id:107,co:'꿈나래학원',sector:'교육서비스',type:'부가세',period:'1기 예정',entity:'개인',dl:'2026-04-25',asgn:'박지훈',status:'예정',half:false,cl:{예정고지금액확인:{done:false,date:'',amount:''},고객안내완료:{done:false,date:''},'면제여부확인 (50만원 미만)':{done:false,date:'',exempt:false},분납여부:{done:false,date:''},납부확인:{done:false,date:''}},special:{환급여부:false,비고:''},pay:{분할여부:false,분할1:'',분할2:'',분할3:'',분할4:'',최종납부확인:false},notes:[]},
   {id:105,co:'강남빌딩관리',sector:'부동산업',type:'법인세',period:'2025 사업연도',dl:'2026-03-31',asgn:'김민준',status:'완료',half:false,cl:{결산자료수취:{done:true,date:'2026-01-10'},결산검토요청:{done:true,date:'2026-01-15'},세무조정검토요청:{done:true,date:'2026-02-01'},세무조정검토완료:{done:true,date:'2026-02-20'},신고서작성:{done:true,date:'2026-03-10'},안내문발송:{done:true,date:'2026-03-20'},최종신고완료:{done:true,date:'2026-03-28'}},손익:{가지급금:'12500000',가수금:'',대표자상여:'3000000'},조정료:{총매출:'850000000',총자산:'',기준금액:'',기본보수:'',감면:'',추가보수:'',할인율:'',할인금액:'',최종확정보수:'1500000',입금금액:'1500000',전년도조정료:'1300000',당해매출:'850000000',전년매출:'760000000'},notes:[{au:'김민준',t:'2026-03-28 16:00',c:'법인세 신고 완료. 조정료 입금 확인.'}]},
@@ -1605,9 +1737,17 @@ function flStageBadge(r){
   if(r.status==='완료') return '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:8px;font-size:11px;font-weight:500;background:#E1F5EE;color:#0F6E56">✓ 전체 완료</span>';
   if(r.status==='누락') return '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:8px;font-size:11px;font-weight:500;background:#FCEBEB;color:#A32D2D">⚠ 누락</span>';
   if(r.status==='예정') return '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:8px;font-size:11px;font-weight:500;background:#F1EFE8;color:#5F5E5A">○ 시작 전</span>';
-  var keys=Object.keys(r.cl);
-  for(var i=0;i<keys.length;i++){if(!r.cl[keys[i]].done)return '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:8px;font-size:11px;font-weight:500;background:#E6F1FB;color:#185FA5">▶ '+keys[i]+'</span>';}
-  return '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:8px;font-size:11px;font-weight:500;background:#E1F5EE;color:#0F6E56">✓ 전체 완료</span>';
+  // 실제 체크리스트 정의 기준으로 진행 상태 계산
+  var defs=r.type==='부가세'?부가세CL(r):(CL_DEF[r.type]||Object.keys(r.cl).map(function(k){return {k:k};}));
+  var done=0,total=defs.length,curStep='';
+  for(var i=0;i<defs.length;i++){
+    var key=defs[i].k;
+    var item=r.cl[key];
+    if(item&&item.done){done++;}
+    else if(!curStep){curStep=key;}
+  }
+  if(total===0||done===total) return '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:8px;font-size:11px;font-weight:500;background:#E1F5EE;color:#0F6E56">✓ 전체 완료</span>';
+  return '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:8px;font-size:11px;font-weight:500;background:#E6F1FB;color:#185FA5">▶ '+curStep+' ('+done+'/'+total+')</span>';
 }
 function flUpdateMonthLabel(){
   document.getElementById('fl-month-label').textContent=flYear+'년 '+flMonth+'월';
@@ -1618,11 +1758,10 @@ function flGoNow(){flYear=today.getFullYear();flMonth=today.getMonth()+1;flUpdat
 function flSetTab(t,el){flTab=t;document.querySelectorAll('#fl-stabs .stab').forEach(function(e){e.classList.remove('on');});el.classList.add('on');flRenderList();}
 function flRenderList(){
   var q=(document.getElementById('fl-q').value||'').toLowerCase();
-  var ft=document.getElementById('fl-f-type').value;
   var fa=document.getElementById('fl-f-asgn').value;
   var rows=FL_DATA.filter(function(r){
     var dl=new Date(r.dl);
-    return dl.getFullYear()===flYear&&dl.getMonth()+1===flMonth&&(!q||r.co.toLowerCase().includes(q))&&(!ft||r.type===ft)&&(!fa||r.asgn===fa)&&(flTab==='all'||r.status===flTab);
+    return dl.getFullYear()===flYear&&dl.getMonth()+1===flMonth&&(!q||r.co.toLowerCase().includes(q))&&(!fa||r.asgn===fa)&&(flTab==='all'||r.status===flTab);
   });
   var all=FL_DATA.filter(function(r){var dl=new Date(r.dl);return dl.getFullYear()===flYear&&dl.getMonth()+1===flMonth;});
   document.getElementById('fl-k-total').textContent=all.length;
@@ -1689,7 +1828,7 @@ function flOpenDetail(id){
     flRenderDetailContent(r,tabs[0]);
   }
 
-  document.getElementById('bc').innerHTML='<span style="cursor:pointer;color:var(--ac)" onclick="goFiling(\'vat\')">신고 일정</span><span style="color:var(--brd);margin:0 5px">›</span><b>'+r.co+'</b>';
+  document.getElementById('bc').innerHTML='<span style="cursor:pointer;color:var(--ac)" onclick="goFiling(\''+curFilingType+'\')">신고 일정</span><span style="color:var(--brd);margin:0 5px">›</span><b>'+r.co+'</b>';
   document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
   document.getElementById('view-filing-detail').classList.add('on');
   document.getElementById('nav-filing-parent').classList.add('on');
@@ -1995,7 +2134,9 @@ function flToggleCl2(id,k){
   if(!r.cl[k]) r.cl[k]={done:false,date:''};
   r.cl[k].done=!r.cl[k].done;
   if(r.cl[k].done&&!r.cl[k].date) r.cl[k].date=today.getFullYear()+'-'+pad(today.getMonth()+1)+'-'+pad(today.getDate());
-  var allDone=Object.values(r.cl).every(function(v){return v.done;});
+  // 실제 CL 정의 기준으로 전체 완료 여부 판단
+  var defs=r.type==='부가세'?부가세CL(r):(CL_DEF[r.type]||Object.keys(r.cl).map(function(k2){return {k:k2};}));
+  var allDone=defs.every(function(def){return r.cl[def.k]&&r.cl[def.k].done;});
   if(allDone) r.status='완료';
   else if(r.status==='완료') r.status='진행중';
   else if(r.status==='예정') r.status='진행중';
@@ -2012,6 +2153,10 @@ function flSetClDate(id,k,v){
   if(!r.cl[k]) r.cl[k]={done:false,date:''};
   r.cl[k].date=v;r.cl[k].done=!!v;
   if(v&&r.status==='예정') r.status='진행중';
+  // 실제 CL 정의 기준 전체 완료 판단
+  var defs=r.type==='부가세'?부가세CL(r):(CL_DEF[r.type]||Object.keys(r.cl).map(function(k2){return {k:k2};}));
+  var allDone=defs.every(function(def){return r.cl[def.k]&&r.cl[def.k].done;});
+  if(allDone) r.status='완료';
   flRenderDetailContent(r,'전체');flRenderList();
 }
 function flSetClAmt2(id,k,v){
@@ -2055,15 +2200,23 @@ function submitFlAdd(){
   var type=document.getElementById('flam-type').value;
   var entity=document.getElementById('flam-entity')?document.getElementById('flam-entity').value:'법인';
   var newR={id:Date.now(),co:co,sector:'',type:type,period:document.getElementById('flam-period').value,entity:entity,dl:dl,asgn:document.getElementById('flam-asgn').value,status:'예정',half:document.getElementById('flam-half').value==='Y',cl:{},notes:[]};
-  if(type==='원천세')newR.cl={급여자료수취:{done:false,date:''},신고서작성:{done:false,date:''},홈택스신고:{done:false,date:''},납부확인:{done:false,date:''},지급명세서제출:{done:false,date:''}};
-  else if(type==='부가세 확정'){newR.cl={자료수취:{done:false,date:''},납부금액:{done:false,date:'',amount:''},상신완료일:{done:false,date:''},최종결재일:{done:false,date:''},신고완료일:{done:false,date:''}};newR.special={환급여부:false,안내문발송:false,비고:''};newR.pay={분할여부:false,분할1:'',분할2:'',분할3:'',분할4:'',최종납부확인:false};}
-  else if(type==='부가세 예정고지')newR.cl={예정고지금액확인:{done:false,date:'',amount:''},고객안내완료:{done:false,date:''},면제여부확인:{done:false,date:'',exempt:false},납부확인:{done:false,date:''},분할납부여부:{done:false,date:''}};
-  else if(type==='법인세'||type==='소득세'){newR.cl={결산자료수취:{done:false,date:''},결산검토요청:{done:false,date:''},세무조정검토요청:{done:false,date:''},세무조정검토완료:{done:false,date:''},신고서작성:{done:false,date:''},안내문발송:{done:false,date:''},최종신고완료:{done:false,date:''}};newR.손익={가지급금:'',가수금:'',대표자상여:''};newR.조정료={총매출:'',총자산:'',기준금액:'',기본보수:'',감면:'',추가보수:'',할인율:'',할인금액:'',최종확정보수:'',입금금액:'',전년도조정료:'',당해매출:'',전년매출:''};}
-  else if(type.startsWith('결산')){newR.cl={결산자료수취:{done:false,date:''},재무제표초안:{done:false,date:''},가결산완료:{done:false,date:''},검토완료일:{done:false,date:''},최종안내여부:{done:false,date:''}};newR.예상={전년매출:'',전년세액:'',예상매출:'',예상세액:'',감면효과:'',검토코멘트:'',비고:''};}
+  if(type==='부가세'){
+    newR.special={환급여부:false,비고:''};
+    newR.pay={분할여부:false,분할1:'',분할2:'',분할3:'',분할4:'',최종납부확인:false};
+    var clDefs=부가세CL(newR);
+    clDefs.forEach(function(d){
+      newR.cl[d.k]={done:false,date:''};
+      if(d.amount!==undefined) newR.cl[d.k].amount='';
+      if(d.exempt!==undefined) newR.cl[d.k].exempt=false;
+    });
+  } else if(CL_DEF[type]){
+    CL_DEF[type].forEach(function(d){newR.cl[d.k]={done:false,date:''};});
+    if(type==='법인세'||type==='소득세'){newR.손익={가지급금:'',가수금:'',대표자상여:''};newR.조정료={총매출:'',총자산:'',기준금액:'',기본보수:'',감면:'',추가보수:'',할인율:'',할인금액:'',최종확정보수:'',입금금액:'',전년도조정료:'',당해매출:'',전년매출:''};}
+    if(type.startsWith('결산')){newR.예상={전년매출:'',전년세액:'',예상매출:'',예상세액:'',감면효과:'',검토코멘트:'',비고:''};}
+  }
   FL_DATA.push(newR);closeFlAdd();flRenderList();
 }
 document.addEventListener('click',function(e){if(e.target===document.getElementById('fl-add-modal'))closeFlAdd();});
-document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='Enter'){var mi=document.getElementById('fl-memo-input');if(mi&&document.activeElement===mi)flAddMemo();}});
 flUpdateMonthLabel();flRenderList();
 
 // 신고일정 서브메뉴
@@ -2072,10 +2225,12 @@ var curFilingType='wht'; // wht | vat | corp | close
 var FILING_TYPE_MAP={
   wht:['원천세','급여명세서'],
   vat:['부가세'],
-  corp:['법인세','소득세'],
-  close:['결산 (상반기)','결산 (하반기)']
+  corp:['법인세'],
+  income:['소득세'],
+  close1:['결산 (상반기)'],
+  close2:['결산 (하반기)']
 };
-var FILING_TYPE_LABELS={wht:'원천세',vat:'부가세',corp:'법인세·소득세',close:'결산'};
+var FILING_TYPE_LABELS={wht:'원천세',vat:'부가세',corp:'법인세',income:'소득세',close1:'결산 (상반기)',close2:'결산 (하반기)'};
 
 function toggleFilingMenu(){
   filingMenuOpen=!filingMenuOpen;
@@ -2093,10 +2248,10 @@ function goFiling(type){
   document.getElementById('fl-vat-nav').style.display=isVat?'block':'none';
   document.getElementById('fl-month-nav').style.display=isVat?'none':'flex';
   document.getElementById('fl-now-btn').style.display=isVat?'none':'';
-  document.getElementById('fl-f-type').style.display=isVat?'none':'';
   // 서브메뉴 활성 표시
-  ['wht','vat','corp','close'].forEach(function(k){
-    document.getElementById('nav-filing-'+k).classList.toggle('on',k===type);
+  ['wht','vat','corp','income','close1','close2'].forEach(function(k){
+    var el=document.getElementById('nav-filing-'+k);
+    if(el) el.classList.toggle('on',k===type);
   });
   document.getElementById('nav-filing-parent').classList.add('on');
   // 상단 제목
@@ -2115,7 +2270,7 @@ function goFiling(type){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// flRenderList에서 세목 필터 자동 적용되게 오버라이드
+// flRenderList 세목 필터 + 담당자 KPI + 정렬 오버라이드
 var _origFlRenderList=flRenderList;
 flRenderList=function(){
   var isVat=curFilingType==='vat';
@@ -2126,32 +2281,54 @@ flRenderList=function(){
 
   function matchRow(r){
     if(isVat){
-      // 부가세: 연도+기수 기준
       if(r.type!=='부가세') return false;
       var dl=new Date(r.dl);
       return dl.getFullYear()===flVatYear&&dl.getMonth()+1===targetMonth;
     } else {
       var dl=new Date(r.dl);
       var inMonth=dl.getFullYear()===flYear&&dl.getMonth()+1===flMonth;
-      var matchType=types.length===0||types.some(function(t){return r.type===t||r.type.startsWith(t.split('·')[0]);});
+      var matchType=types.length===0||types.some(function(t){return r.type===t;});
       return inMonth&&matchType;
     }
   }
 
   var all=FL_DATA.filter(matchRow);
-  var rows=all.filter(function(r){
-    return (!q||r.co.toLowerCase().includes(q))&&(!fa||r.asgn===fa)&&(flTab==='all'||r.status===flTab);
-  });
 
+  // 전체 담당자 KPI (상단 - 항상 전체)
   document.getElementById('fl-k-total').textContent=all.length;
   document.getElementById('fl-k-done').textContent=all.filter(function(r){return r.status==='완료';}).length;
   document.getElementById('fl-k-prog').textContent=all.filter(function(r){return r.status==='진행중';}).length;
   document.getElementById('fl-k-miss').textContent=all.filter(function(r){return r.status==='누락';}).length;
   document.getElementById('fl-k-urg').textContent=all.filter(function(r){return r.status!=='완료'&&r.status!=='누락'&&flDayDiff(r.dl)<=3;}).length;
+
+  // 담당자 선택 시 하위 KPI 표시
+  var asgnKpiWrap=document.getElementById('fl-asgn-kpi');
+  if(fa){
+    var asgnAll=all.filter(function(r){return r.asgn===fa;});
+    document.getElementById('fl-asgn-kpi-label').textContent=fa+' 담당자 현황';
+    document.getElementById('fl-ak-total').textContent=asgnAll.length;
+    document.getElementById('fl-ak-done').textContent=asgnAll.filter(function(r){return r.status==='완료';}).length;
+    document.getElementById('fl-ak-prog').textContent=asgnAll.filter(function(r){return r.status==='진행중';}).length;
+    document.getElementById('fl-ak-miss').textContent=asgnAll.filter(function(r){return r.status==='누락';}).length;
+    document.getElementById('fl-ak-urg').textContent=asgnAll.filter(function(r){return r.status!=='완료'&&r.status!=='누락'&&flDayDiff(r.dl)<=3;}).length;
+    asgnKpiWrap.style.display='block';
+  } else {
+    asgnKpiWrap.style.display='none';
+  }
+
+  var rows=all.filter(function(r){
+    return (!q||r.co.toLowerCase().includes(q))&&(!fa||r.asgn===fa)&&(flTab==='all'||r.status===flTab);
+  });
+
   document.getElementById('fl-res-cnt').textContent='총 '+rows.length+'건';
 
+  // 정렬: 진행상태(누락→진행중→예정→완료) → 업체명 가나다순
   var ord={누락:0,진행중:1,예정:2,완료:3};
-  rows.sort(function(a,b){return ord[a.status]-ord[b.status]||new Date(a.dl)-new Date(b.dl);});
+  rows.sort(function(a,b){
+    var so=( ord[a.status]||9)-(ord[b.status]||9);
+    if(so!==0) return so;
+    return a.co.localeCompare(b.co,'ko');
+  });
 
   if(!rows.length){
     var msg=isVat
@@ -2162,7 +2339,6 @@ flRenderList=function(){
   }
 
   document.getElementById('fl-tbl-body').innerHTML=rows.map(function(r){
-    // 부가세 예정고지 여부: 개인 + 1기예정(4월) 또는 2기예정(10월)
     var isGoji=isVat&&r.entity==='개인'&&(r.period==='1기 예정'||r.period==='2기 예정');
     var entityBadge=r.entity?'&nbsp;<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:var(--sur2);color:var(--tx3);border:1px solid var(--brd)">'+r.entity+'</span>':'';
     var gojiTag=isGoji?'&nbsp;<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:#FAEEDA;color:#854F0B;border:1px solid #f9dba0">예정고지</span>':'';
@@ -2243,26 +2419,71 @@ function openAddRoutine(){
   document.getElementById('rm-name').value='';
   document.getElementById('rm-memo').value='';
   document.getElementById('rm-assignee-wrap').style.display='none';
+  document.getElementById('rm-client-wrap').style.display='none';
+  document.getElementById('rm-client-q').value='';
+  document.getElementById('rm-client-list').innerHTML='';
+  document.getElementById('rm-client-selected').innerHTML='';
+  rmSelectedClients=[];
+  document.getElementById('rm-target').value='all';
   document.getElementById('routine-modal').style.display='flex';
   setTimeout(function(){document.getElementById('rm-name').focus();},80);
 }
 function closeRoutineModal(){document.getElementById('routine-modal').style.display='none';}
-document.getElementById('rm-target').addEventListener('change',function(){
-  document.getElementById('rm-assignee-wrap').style.display=this.value==='fixed'?'block':'none';
-});
+
+var rmSelectedClients=[];
+function onRmTargetChange(val){
+  document.getElementById('rm-assignee-wrap').style.display=val==='fixed'?'block':'none';
+  document.getElementById('rm-client-wrap').style.display=val==='client'?'block':'none';
+  if(val==='client'){filterRmClients();}
+}
+function filterRmClients(){
+  var q=(document.getElementById('rm-client-q').value||'').toLowerCase();
+  var list=document.getElementById('rm-client-list');
+  var filtered=CLIENTS.filter(function(c){
+    return (!q||c.name.toLowerCase().includes(q))&&rmSelectedClients.indexOf(c.id)<0;
+  });
+  if(!filtered.length){list.innerHTML='<div style="padding:10px 12px;font-size:12px;color:var(--tx3)">검색 결과 없음</div>';return;}
+  list.innerHTML=filtered.map(function(c){
+    return '<div onclick="selectRmClient('+c.id+')" style="padding:8px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between" onmouseenter="this.style.background=\'var(--acl)\'" onmouseleave="this.style.background=\'\'">'
+      +'<span>'+c.name+'</span><span style="font-size:10px;color:var(--tx3)">'+c.entity+'</span></div>';
+  }).join('');
+}
+function selectRmClient(id){
+  if(rmSelectedClients.indexOf(id)>=0) return;
+  rmSelectedClients.push(id);
+  document.getElementById('rm-client-q').value='';
+  renderRmSelected();filterRmClients();
+}
+function removeRmClient(id){
+  rmSelectedClients=rmSelectedClients.filter(function(x){return x!==id;});
+  renderRmSelected();filterRmClients();
+}
+function renderRmSelected(){
+  var el=document.getElementById('rm-client-selected');
+  el.innerHTML=rmSelectedClients.map(function(id){
+    var c=CLIENTS.find(function(x){return x.id===id;});
+    if(!c) return '';
+    return '<div style="display:flex;align-items:center;gap:4px;padding:3px 9px;background:var(--acl);border:1px solid #9FE1CB;border-radius:20px;font-size:12px;color:var(--ac)">'
+      +c.name+'<span onclick="removeRmClient('+id+')" style="cursor:pointer;font-size:14px;line-height:1">×</span></div>';
+  }).join('');
+}
+
 function saveRoutine(){
   var name=document.getElementById('rm-name').value.trim();
   if(!name){document.getElementById('rm-name').focus();return;}
   var dayVal=document.getElementById('rm-day').value;
+  var targetVal=document.getElementById('rm-target').value;
   CUSTOM_ROUTINES.push({
     id:'c'+Date.now(),name:name,
     day:dayVal==='last'?'last':parseInt(dayVal),
     level:document.getElementById('rm-level').value,
-    target:document.getElementById('rm-target').value,
-    assignee:document.getElementById('rm-target').value==='fixed'?document.getElementById('rm-assignee').value:null,
+    target:targetVal,
+    clientIds:targetVal==='client'?rmSelectedClients.slice():null,
+    assignee:targetVal==='fixed'?document.getElementById('rm-assignee').value:null,
     memo:document.getElementById('rm-memo').value||'',
     on:true,system:false
   });
+  rmSelectedClients=[];
   closeRoutineModal();renderRoutineList();renderDash();
 }
 
@@ -2274,7 +2495,7 @@ generateTasks=function(){
   var curYear=today.getFullYear();
   var curMonth=today.getMonth()+1;
   var lastDay=getLastDay(curYear,curMonth);
-  var curUser=document.getElementById('dash-role')?document.getElementById('dash-role').dataset.user:'김민준';
+  var curUser=ROLES[currentRole]?ROLES[currentRole].user:'김민준';
 
   function hasPayrollClients(assignee){
     return CLIENTS.some(function(c){
@@ -2369,7 +2590,14 @@ generateTasks=function(){
   ROUTINES.concat(CUSTOM_ROUTINES).forEach(function(r){
     if(!r.on) return;
     if(r.target==='fixed'&&r.assignee!==curUser) return;
-    if(r.target!=='fixed'&&r.target!=='none'){
+    if(r.target==='client'){
+      // 개별 거래처 중 내 담당인 것만
+      var hasMyClient=r.clientIds&&r.clientIds.some(function(id){
+        return CLIENTS.some(function(c){return c.id===id&&c.assignee===curUser;});
+      });
+      if(!hasMyClient) return;
+    }
+    if(r.target!=='fixed'&&r.target!=='none'&&r.target!=='client'){
       if(r.target==='payroll'&&!hasPayrollClients(curUser)) return;
     }
     var targetDay=r.day==='last'?lastDay:r.day;
